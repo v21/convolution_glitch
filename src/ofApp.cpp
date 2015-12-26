@@ -16,7 +16,7 @@ void ofApp::setup(){
     for(int x = 0; x < 1024; x++){
         for(int y = 0; y < 768; y++){
             mesh.addVertex(ofVec3f(x,y));
-            mesh.addTexCoord(ofVec2f(x, y));
+            mesh.addTexCoord(ofVec2f(x, y-1)); //why -1? i don't know. but otherwise the image goes up off the screen
         }
     }
 

@@ -31,6 +31,6 @@ void main(){
     accum += texture(cam, varyingtexcoord + vec2(1,0) * samplingOffset) * convolution[2][1];
     accum += texture(cam, varyingtexcoord + vec2(1,1) * samplingOffset) * convolution[2][2];
     
-    //outputColor = accum;
+    outputColor = accum;
     
 }
