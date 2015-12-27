@@ -16,7 +16,7 @@ void ofApp::setup(){
     for(int x = 0; x < 1024; x++){
         for(int y = 0; y < 768; y++){
             mesh.addVertex(ofVec3f(x,y));
-            mesh.addTexCoord(ofVec2f(x, y-1)); //why -1? i don't know. but otherwise the image goes up off the screen
+            mesh.addTexCoord(ofVec2f(x-0, y-0.5)); //why -1? i don't know. but otherwise the image goes up off the screen
         }
     }
 
@@ -32,39 +32,25 @@ void ofApp::setup(){
 void ofApp::update(){
     camera.update();
     
-    if (timer > 2 && timered)
-    {
-        buf.dst->draw(0,0,1024,768);
-        
-        return;
-    }
     
     
     buf.dst->begin();
     
     shader.begin();
     
-    if (capture)
-    {
-        shader.setUniformTexture("cam", camera.getTexture(), 0);
-        //camera.draw(0,0,1024,768);
-        
-        capture = false;
-        
-    }
-    else
-    {
-        timer ++;
-        //ofClear(255, 255, 255, 255);
-        shader.setUniformTexture("cam", buf.src->getTexture(),0);
-        //fbo.draw(0,0,1024,768);
-    }
+    shader.setUniformTexture("cam", camera.getTexture(), 0);
     
-    
+    shader.setUniformTexture("recurse", buf.src->getTexture(),1);
     
     
     shader.setUniformMatrix3f("convolution", matrix);
-    shader.setUniform1f("samplingOffset", samplingOffset);
+    shader.setUniform1f("varyingSamplingOffset", samplingOffset);
+    
+    shader.setUniform1f("sourceOpacity", sourceOpacity);
+    shader.setUniform1f("greyscale", greyscale);
+    
+    shader.setUniform1f("scale", scale);
+
     
     mesh.draw();
     
@@ -111,12 +97,6 @@ void ofApp::keyPressed(int key){
         shader.load("shaders/convolution.vert","shaders/convolution.frag");
     }
     
-    if (key == ' ')
-    {
-        capture = true;
-        timer = 0;
-    }
-    
     if (key == 'z')
     {
         
@@ -142,12 +122,47 @@ void ofApp::keyPressed(int key){
                              0.1,0.1,0.1);
     }
     
-    if (key == 'q')
+    if (key == '[')
     {
-        timered = !timered;
-        
-        ofLog() << "timered " << timered;
+        sourceOpacity = MAX(0, sourceOpacity - 0.03);
+        ofLog() << "sourceOpacity " << sourceOpacity;
     }
+    
+    if (key == ']')
+    {
+        sourceOpacity = MIN(1, sourceOpacity + 0.03);
+        ofLog() << "sourceOpacity " << sourceOpacity;
+    }
+    
+    
+    if (key == 'o')
+    {
+        greyscale = MAX(0, greyscale - 0.03);
+        ofLog() << "greyscale " << greyscale;
+    }
+    
+    if (key == 'p')
+    {
+        greyscale = MIN(1, greyscale + 0.03);
+        ofLog() << "greyscale " << greyscale;
+    }
+
+    
+    
+    if (key == 'k')
+    {
+        scale = MAX(1, scale - 1);
+        ofLog() << "scale " << scale;
+    }
+    
+    if (key == 'l')
+    {
+        scale = MIN(100, scale + 1);
+        ofLog() << "scale " << scale;
+    }
+    
+    
+
     
 
 }
@@ -160,8 +175,8 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-    samplingOffset = y / 768.0 * 10;
-    ofLog() << "samplingOffset " << samplingOffset;
+    //samplingOffset = y / 768.0 * 10;
+    //ofLog() << "samplingOffset " << samplingOffset;
 }
 
 //--------------------------------------------------------------

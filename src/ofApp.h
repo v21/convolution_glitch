@@ -76,9 +76,8 @@ class ofApp : public ofBaseApp{
     
     pingPongBuffer buf;
     
-    bool capture;
-    int timer;
-    bool timered;
-    int scale = 1;
+    float scale = 1;
+    float sourceOpacity = 0.5;
+    float greyscale = 0.5;
     float samplingOffset = 1;
 };
