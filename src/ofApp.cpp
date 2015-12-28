@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     //ofDisableArbTex();
-    shader.load("shaders/convolution.vert","shaders/convolution.frag");
+    convolveShader.load("shaders/convolution.vert","shaders/convolution.frag");
     int camWidth = 1024;
     int camHeight = 768;
     
@@ -30,38 +30,43 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    camera.update();
     
-    
-    
-    buf.dst->begin();
-    
-    shader.begin();
-    
-    shader.setUniformTexture("cam", camera.getTexture(), 0);
-    
-    shader.setUniformTexture("recurse", buf.src->getTexture(),1);
-    
-    
-    shader.setUniformMatrix3f("convolution", matrix);
-    shader.setUniform1f("varyingSamplingOffset", samplingOffset);
-    
-    shader.setUniform1f("sourceOpacity", sourceOpacity);
-    shader.setUniform1f("greyscale", greyscale);
-    
-    shader.setUniform1f("scale", scale);
-
-    
-    mesh.draw();
-    
-    
-    shader.end();
-    
-    
-    buf.dst->end();
-    
-    buf.swap();
-
+    if (ofGetElapsedTimef() > speed + lastUpdateTime)
+    {
+        camera.update();
+        
+        
+        
+        buf.dst->begin();
+        
+        convolveShader.begin();
+        
+        convolveShader.setUniformTexture("cam", camera.getTexture(), 0);
+        
+        convolveShader.setUniformTexture("recurse", buf.src->getTexture(),1);
+        
+        
+        convolveShader.setUniformMatrix3f("convolution", matrix);
+        convolveShader.setUniform1f("varyingSamplingOffset", samplingOffset);
+        
+        convolveShader.setUniform1f("sourceOpacity", sourceOpacity);
+        convolveShader.setUniform1f("greyscale", greyscale);
+        
+        convolveShader.setUniform1f("scale", scale);
+        
+        
+        mesh.draw();
+        
+        
+        convolveShader.end();
+        
+        
+        buf.dst->end();
+        
+        buf.swap();
+        
+        lastUpdateTime = ofGetElapsedTimef();
+    }
 }
 
 //--------------------------------------------------------------
@@ -94,7 +99,7 @@ void ofApp::keyPressed(int key){
     if (key == 'r')
     {
         
-        shader.load("shaders/convolution.vert","shaders/convolution.frag");
+        convolveShader.load("shaders/convolution.vert","shaders/convolution.frag");
     }
     
     if (key == 'z')
@@ -162,6 +167,19 @@ void ofApp::keyPressed(int key){
     }
     
     
+    
+    if (key == ',')
+    {
+        speed = MAX(0.01, speed - 0.01);
+        ofLog() << "speed " << speed;
+    }
+    
+    if (key == '.')
+    {
+        speed = MIN(1, speed + 0.01);
+        ofLog() << "speed " << speed;
+    }
+    
 
     
 
@@ -175,8 +193,8 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-    //samplingOffset = y / 768.0 * 10;
-    //ofLog() << "samplingOffset " << samplingOffset;
+    samplingOffset = y / 768.0 * 10;
+    ofLog() << "samplingOffset " << samplingOffset;
 }
 
 //--------------------------------------------------------------

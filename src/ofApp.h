@@ -67,7 +67,8 @@ class ofApp : public ofBaseApp{
     
     ofMatrix3x3 genConvolveMatrix(float range);
     
-    ofShader shader;
+    ofShader combineShader;
+    ofShader convolveShader;
     ofVideoGrabber  camera;
     ofMatrix3x3 matrix;
     
@@ -80,4 +81,6 @@ class ofApp : public ofBaseApp{
     float sourceOpacity = 0.5;
     float greyscale = 0.5;
     float samplingOffset = 1;
+    float speed = 0.2;
+    float lastUpdateTime;
 };
